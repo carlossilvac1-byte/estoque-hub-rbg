@@ -1,1 +1,1 @@
-1.0.0 - etapa 1 - base, acesso e cadastros de contexto
+1.0.1 - etapa 1 - base central Supabase configurada
