@@ -2,7 +2,7 @@
    service-worker.js - pré-cache do app, rede primeiro, Background Sync
    VERSAO muda junto com config.js (versao) e versao.txt a cada entrega.
    ===================================================================== */
-const VERSAO = '1.0.0';
+const VERSAO = '1.0.1';
 const CACHE = 'estoque-hub-rbg-' + VERSAO;
 const ARQUIVOS = [
   './',
