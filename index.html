@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#12373d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Estoque HUB">
+  <title>Estoque de Materiais – HUB RBG | EDP Transmissão</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="modo-acesso">
+
+  <!-- ===================== ACESSO ===================== -->
+  <div id="acesso">
+    <div class="acesso-caixa">
+      <div class="acesso-marca">
+        <img src="icons/logo-edp-branco.png" alt="EDP">
+        <div>Estoque de materiais · HUB RBG</div>
+      </div>
+
+      <section class="tela acesso-card" id="tela-login" hidden aria-labelledby="login-titulo">
+        <h1 id="login-titulo">Entrar</h1>
+        <p class="muted" id="login-sub">Use o e-mail corporativo cadastrado.</p>
+        <form id="form-login" class="form-grid" novalidate>
+          <div class="campo" id="campo-login-nome" hidden>
+            <label for="login-nome">Nome completo *</label>
+            <input id="login-nome" type="text" autocomplete="name">
+          </div>
+          <div class="campo">
+            <label for="login-email">E-mail *</label>
+            <input id="login-email" type="email" autocomplete="username" inputmode="email" required>
+          </div>
+          <div class="campo" id="campo-login-senha">
+            <label for="login-senha">Senha *</label>
+            <input id="login-senha" type="password" autocomplete="current-password" required minlength="8">
+            <span class="ajuda" id="login-senha-ajuda" hidden>Mínimo de 8 caracteres.</span>
+          </div>
+          <button type="submit" class="btn btn-primario btn-bloco" id="login-enviar">Entrar</button>
+        </form>
+        <div class="acesso-links">
+          <button type="button" class="link-btn" id="login-alternar">Criar conta</button>
+          <button type="button" class="link-btn" id="login-esqueci">Esqueci a senha</button>
+        </div>
+        <div class="aviso-config" id="login-sem-config" hidden>
+          A base central ainda não foi configurada neste endereço. Preencha a URL e a chave anon do Supabase em
+          <span class="mono">config.js</span> (ver <span class="mono">banco/ATIVAR-BASE-CENTRAL.md</span>).
+        </div>
+      </section>
+
+      <section class="tela acesso-card" id="tela-aguardando" hidden aria-labelledby="aguard-titulo">
+        <h1 id="aguard-titulo">Acesso em análise</h1>
+        <p class="muted" id="aguard-texto">Seu cadastro foi recebido e aguarda liberação de um administrador.
+          Assim que for liberado, esta tela muda sozinha.</p>
+        <div class="form-grid">
+          <div class="nota" id="aguard-dados"></div>
+          <button type="button" class="btn btn-primario btn-bloco" id="aguard-verificar">Verificar agora</button>
+          <button type="button" class="btn btn-bloco" id="aguard-sair">Sair</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== APLICATIVO ===================== -->
+  <div class="app">
+    <nav class="sidebar" aria-label="Menu principal">
+      <div class="marca">
+        <img src="icons/logo-edp-branco.png" alt="EDP">
+        <div>ESTOQUE DE MATERIAIS · HUB RBG</div>
+      </div>
+      <div id="menu-lateral" class="menu-wrap"></div>
+      <div class="usuario">
+        <div class="avatar" aria-hidden="true" id="usr-iniciais">--</div>
+        <div><span class="nome" id="usr-nome">-</span><span class="papel" id="usr-papel">-</span></div>
+        <button type="button" class="sair" id="btn-sair" aria-label="Sair do sistema" title="Sair">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <div class="conteudo">
+      <header class="topo">
+        <div class="linha1">
+          <img class="logo-mobile" src="icons/logo-edp-branco.png" alt="EDP">
+          <div class="breadcrumb" id="breadcrumb">Estoque de materiais</div>
+        </div>
+        <div class="contexto" role="group" aria-label="Contexto de trabalho">
+          <label for="ctx-empresa">EMPRESA <select id="ctx-empresa"></select></label>
+          <label for="ctx-projeto">PROJETO <select id="ctx-projeto"></select></label>
+          <label for="ctx-lote">LOTE <select id="ctx-lote"></select></label>
+          <label for="ctx-local">LOCAL <select id="ctx-local"></select></label>
+        </div>
+      </header>
+      <div class="offline-faixa" id="faixa-offline" hidden role="status">Sem conexão. Os registros ficam salvos neste aparelho e serão enviados quando a conexão voltar.</div>
+      <div class="sync-faixa" id="faixa-sync" hidden role="status">
+        <span id="faixa-sync-texto">Aguardando envio</span>
+        <button type="button" class="btn btn-peq" id="faixa-sync-enviar">Enviar agora</button>
+      </div>
+
+      <main id="principal">
+        <!-- Painel / início -->
+        <section class="tela" id="tela-inicio" hidden aria-labelledby="inicio-titulo">
+          <div class="tela-cabecalho">
+            <div>
+              <h1 id="inicio-titulo">Painel do estoque</h1>
+              <p id="inicio-sub">Visão geral do contexto selecionado.</p>
+            </div>
+          </div>
+          <div class="grade-cards" id="inicio-cards"></div>
+          <div class="grade-lateral" style="margin-top:24px">
+            <section class="card" aria-labelledby="inicio-etapas-tit">
+              <div class="card-cab"><h2 id="inicio-etapas-tit">Implantação do sistema</h2><span>Entregas por etapa</span></div>
+              <ol class="etapas" id="inicio-etapas"></ol>
+            </section>
+            <section class="card" aria-labelledby="inicio-acesso-tit">
+              <div class="card-cab"><h2 id="inicio-acesso-tit">Seu acesso</h2></div>
+              <div class="card-corpo" id="inicio-acesso"></div>
+            </section>
+          </div>
+        </section>
+
+        <!-- Empresas, projetos e lotes -->
+        <section class="tela" id="tela-contexto" hidden aria-labelledby="ctxcad-titulo">
+          <div class="tela-cabecalho">
+            <div>
+              <h1 id="ctxcad-titulo">Empresas, projetos e lotes</h1>
+              <p>Cadastre empresas, projetos e lotes e defina a quais deles cada usuário tem acesso.</p>
+            </div>
+            <div class="acoes" id="ctxcad-acoes">
+              <button type="button" class="btn" id="ctxcad-importar">Importar planilha</button>
+              <button type="button" class="btn btn-primario" id="ctxcad-novo">+ Novo cadastro</button>
+              <input type="file" id="ctxcad-arquivo" accept=".csv,.xlsx,.xls,.xlsm" hidden>
+            </div>
+          </div>
+          <div class="abas" role="tablist" aria-label="Cadastros de contexto" id="ctxcad-abas"></div>
+          <div id="ctxcad-painel" role="tabpanel"></div>
+        </section>
+
+        <!-- Funcionalidades das próximas etapas -->
+        <section class="tela" id="tela-em-breve" hidden aria-labelledby="embreve-titulo">
+          <div class="card em-breve">
+            <h2 id="embreve-titulo">Em construção</h2>
+            <p class="muted" id="embreve-texto"></p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <nav class="nav-inferior" aria-label="Navegação principal" id="nav-inferior"></nav>
+  </div>
+
+  <!-- Painel "Mais" (celular) -->
+  <div class="mais-painel" id="mais-painel" hidden>
+    <div class="mais-conteudo" role="dialog" aria-modal="true" aria-label="Mais opções" id="mais-conteudo"></div>
+  </div>
+
+  <!-- Modal de confirmação -->
+  <div class="modal-fundo" id="modal-confirmar" hidden>
+    <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-conf-titulo" aria-describedby="modal-conf-texto">
+      <div class="modal-cab"><h2 id="modal-conf-titulo">Confirmar</h2></div>
+      <div class="modal-corpo"><p id="modal-conf-texto"></p></div>
+      <div class="modal-acoes">
+        <button type="button" class="btn" id="modal-conf-cancelar">Cancelar</button>
+        <button type="button" class="btn btn-primario" id="modal-conf-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="avisos" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="vendor/dexie.min.js"></script>
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="config.js"></script>
+  <script src="db.js"></script>
+  <script src="auth.js"></script>
+  <script src="sync.js"></script>
+  <script src="app.js"></script>
+  <script src="cadastros.js"></script>
+</body>
+</html>
