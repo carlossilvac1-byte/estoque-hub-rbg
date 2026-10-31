@@ -5,14 +5,14 @@
    ===================================================================== */
 const CONFIG = (function () {
   return {
-    versao: '1.0.0',
+    versao: '1.0.1',
     etapa: 1,
     nomeApp: 'Estoque de Materiais – HUB RBG',
     empresaApp: 'EDP Transmissão Norte Nordeste 2 S.A.',
 
     // Base central
-    supabaseUrl: '',      // ex.: 'https://abcdefghij.supabase.co'
-    supabaseAnon: '',     // chave "anon public" do projeto
+    supabaseUrl: 'https://gpkbmyoeakbkqoxfjybb.supabase.co',
+    supabaseAnon: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdwa2JteW9lYWtia3FveGZqeWJiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM0MDcwODUsImV4cCI6MjEwODk4MzA4NX0.3rasaKi_4VbNiYxk81KAUNVcB4XJZj3qxUED7L_25-A', // chave anon public (segura com RLS)
     bucket: 'estoque',
 
     // Sincronização
