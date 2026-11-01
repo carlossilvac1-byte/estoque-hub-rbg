@@ -1,6 +1,6 @@
 # Ativar a base central (Supabase) – Estoque de Materiais HUB RBG
 
-Etapa 1 – versão 1.0.0. Siga na ordem. Nenhum passo usa a chave `service_role`.
+Versão 1.1.0 (etapas 1 a 3). Siga na ordem. Nenhum passo usa a chave `service_role`.
 
 ## 1. Criar o projeto no Supabase
 1. Acesse https://supabase.com e entre com a conta corporativa.
@@ -16,6 +16,10 @@ Rode **um por vez, nesta ordem**. Todos podem ser executados de novo sem erro.
 | 2 | `02-acesso-rls.sql` | Funções de acesso, RLS, cadastro automático de usuário pendente e tempo real |
 | 3 | `03-storage.sql` | Bucket privado `estoque` e políticas dos arquivos |
 | 4 | `04-dados-iniciais.sql` | EDP, projeto LT 500 kV Colinas–Ribeiro Gonçalves C3, lotes TN02/TN05/TN07/TN13 e local HUB RBG |
+| 5 | `05-cadastros.sql` | Etapa 2: materiais, preços de referência (cabos 20,98640209; fixadores 9,35; ferragem 9,352 R$/kg), fornecedores e frentes de serviço |
+| 6 | `06-entrada.sql` | Etapa 3: entradas, itens (cálculo de peso e valor no servidor), conferência física e anexos PDF; NF duplicada bloqueada |
+
+Base já ativada na etapa 1? Rode só o **05** e o **06**, nesta ordem.
 
 Se o `03-storage.sql` acusar que o bucket não pode ser criado por SQL, crie em **Storage → New bucket**: nome `estoque`, **Public desligado**, limite 20 MB, e rode o script de novo (as políticas serão criadas).
 
@@ -27,7 +31,7 @@ Se o `03-storage.sql` acusar que o bucket não pode ser criado por SQL, crie em 
 3. (Opcional) **Authentication → Emails**: traduza os textos dos e-mails de confirmação e de nova senha.
 
 ## 4. Tempo real
-O `02-acesso-rls.sql` já inclui as tabelas na publicação `supabase_realtime`. Confira em **Database → Publications → supabase_realtime**: devem aparecer empresas, projetos, locais, lotes e usuarios.
+Os scripts já incluem as tabelas na publicação `supabase_realtime`. Confira em **Database → Publications → supabase_realtime**: devem aparecer empresas, projetos, locais, lotes, usuarios e entradas.
 
 ## 5. Ligar o aplicativo à base
 1. **Project Settings → API**: copie a **Project URL** e a chave **anon public**.

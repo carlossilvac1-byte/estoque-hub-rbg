@@ -141,6 +141,52 @@
           <div id="ctxcad-painel" role="tabpanel"></div>
         </section>
 
+        <!-- Portal de Entrada (etapa 3) -->
+        <section class="tela tela-entrada" id="tela-entrada" hidden aria-labelledby="entrada-titulo">
+          <div id="ent-conteudo"></div>
+        </section>
+
+        <!-- Materiais (etapa 2) -->
+        <section class="tela" id="tela-materiais" hidden aria-labelledby="mat-titulo">
+          <div class="tela-cabecalho">
+            <div>
+              <h1 id="mat-titulo">Materiais</h1>
+              <p>Catálogo de materiais da LT com peso unitário e preço de referência usados nos cálculos.</p>
+            </div>
+            <div class="acoes" id="mat-acoes">
+              <button type="button" class="btn" id="mat-modelo">Baixar modelo</button>
+              <button type="button" class="btn" id="mat-importar">Importar planilha</button>
+              <button type="button" class="btn btn-primario" id="mat-novo">+ Novo material</button>
+              <input type="file" id="mat-arquivo" accept=".csv,.xlsx,.xls,.xlsm" hidden>
+            </div>
+          </div>
+          <div id="mat-conteudo"></div>
+        </section>
+
+        <!-- Fornecedores (etapa 2) -->
+        <section class="tela" id="tela-fornecedores" hidden aria-labelledby="forn-titulo">
+          <div class="tela-cabecalho">
+            <div>
+              <h1 id="forn-titulo">Fornecedores</h1>
+              <p>Fornecedores de materiais da LT e as notas fiscais recebidas.</p>
+            </div>
+            <div class="acoes"><button type="button" class="btn btn-primario" id="forn-novo">+ Novo fornecedor</button></div>
+          </div>
+          <div id="forn-conteudo"></div>
+        </section>
+
+        <!-- Frentes de serviço (etapa 2) -->
+        <section class="tela" id="tela-frentes" hidden aria-labelledby="frt-titulo">
+          <div class="tela-cabecalho">
+            <div>
+              <h1 id="frt-titulo">Frentes de serviço</h1>
+              <p>Destinos das saídas de material: frente, empresa executora, trecho e local de entrega.</p>
+            </div>
+            <div class="acoes"><button type="button" class="btn btn-primario" id="frt-novo">+ Nova frente</button></div>
+          </div>
+          <div id="frt-conteudo"></div>
+        </section>
+
         <!-- Funcionalidades das próximas etapas -->
         <section class="tela" id="tela-em-breve" hidden aria-labelledby="embreve-titulo">
           <div class="card em-breve">
@@ -180,6 +226,8 @@
   <script src="auth.js"></script>
   <script src="sync.js"></script>
   <script src="app.js"></script>
+  <script src="anexos.js"></script>
   <script src="cadastros.js"></script>
+  <script src="entrada.js"></script>
 </body>
 </html>

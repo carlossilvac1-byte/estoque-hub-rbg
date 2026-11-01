@@ -5,7 +5,9 @@
      _sync: 'pendente' | 'sincronizado' | 'erro'   _erro: mensagem
    ===================================================================== */
 const DB = (function () {
-  const TABELAS = ['empresas', 'projetos', 'locais', 'lotes', 'usuarios', 'historico'];
+  const TABELAS = ['empresas', 'projetos', 'locais', 'lotes', 'usuarios', 'historico',
+    'materiais', 'fornecedores', 'precos_referencia', 'frentes_servico',
+    'entradas', 'entrada_itens', 'entrada_conferencia', 'anexos'];
 
   const db = new Dexie('estoque_hub_rbg');
   db.version(1).stores({
@@ -16,6 +18,18 @@ const DB = (function () {
     usuarios: 'id, _sync, recebido_em',
     historico: 'id, _sync, recebido_em, registro_id',
     meta: 'chave'
+  });
+  // Etapas 2 e 3: cadastros, Portal de Entrada e arquivos PDF (bytes locais)
+  db.version(2).stores({
+    materiais: 'id, _sync, recebido_em, familia',
+    fornecedores: 'id, _sync, recebido_em, empresa_id',
+    precos_referencia: 'id, _sync, recebido_em, projeto_id',
+    frentes_servico: 'id, _sync, recebido_em, projeto_id',
+    entradas: 'id, _sync, recebido_em, projeto_id, fornecedor_id',
+    entrada_itens: 'id, _sync, recebido_em, entrada_id',
+    entrada_conferencia: 'id, _sync, recebido_em, entrada_id',
+    anexos: 'id, _sync, recebido_em, documento_id',
+    arquivos: 'id'
   });
 
   function uuid() {
@@ -86,6 +100,7 @@ const DB = (function () {
   }
   async function limparTudo() {
     for (const t of TABELAS) await db[t].clear();
+    await db.arquivos.clear();
     await db.meta.clear();
   }
 

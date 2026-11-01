@@ -8,9 +8,13 @@
    - Tempo real: websocket Phoenix, heartbeat 25 s, renovação do token.
    ===================================================================== */
 const SYNC = (function () {
+  // Ordem importa: pais antes de filhos; anexos antes das entradas (a confirmação exige os PDFs no servidor).
   const TABELAS = [
     { nome: 'empresas' }, { nome: 'projetos' }, { nome: 'locais' }, { nome: 'lotes' },
-    { nome: 'usuarios' }, { nome: 'historico', somenteInsercao: true }
+    { nome: 'usuarios' },
+    { nome: 'fornecedores' }, { nome: 'materiais' }, { nome: 'precos_referencia' }, { nome: 'frentes_servico' },
+    { nome: 'anexos', arquivo: true }, { nome: 'entradas' }, { nome: 'entrada_itens' }, { nome: 'entrada_conferencia' },
+    { nome: 'historico', somenteInsercao: true }
   ];
   let rodando = false, deNovo = false, timer = null, agendado = null;
   const semTabela = new Set();
@@ -65,7 +69,9 @@ const SYNC = (function () {
   // ---------------- Envio ----------------
   async function enviarTabela(def) {
     const t = def.nome;
-    const pend = await DB.db[t].where('_sync').anyOf('pendente', 'erro').toArray();
+    let pend = await DB.db[t].where('_sync').anyOf('pendente', 'erro').toArray();
+    if (!pend.length) return 0;
+    if (def.arquivo) pend = await enviarArquivos(pend);
     if (!pend.length) return 0;
     let enviados = 0;
     for (let i = 0; i < pend.length; i += CONFIG.loteEnvio) {
@@ -79,6 +85,29 @@ const SYNC = (function () {
       enviados += lote.length;
     }
     return enviados;
+  }
+
+  /** Envia os PDFs ao Storage antes das linhas de "anexos". Devolve só os prontos para gravar. */
+  async function enviarArquivos(pend) {
+    const prontos = [];
+    for (const reg of pend) {
+      if (reg._arquivo_enviado || reg.excluido_em) { prontos.push(reg); continue; }
+      const r = await ANEXOS.enviarArquivo(reg);
+      if (r.rede) throw new Error('rede');
+      const atual = await DB.db.anexos.get(reg.id);
+      if (!atual) continue;
+      if (r.ok) {
+        semTabela.delete('storage:estoque');
+        atual._arquivo_enviado = true;
+        await DB.db.anexos.put(atual);
+        prontos.push(Object.assign({}, reg, { _arquivo_enviado: true }));
+      } else {
+        if (r.semBucket) avisarSemTabela('storage:estoque');
+        if (atual.atualizado_em === reg.atualizado_em) { atual._sync = 'erro'; atual._erro = r.msg; await DB.db.anexos.put(atual); }
+        ultimoErro = r.msg;
+      }
+    }
+    return prontos;
   }
 
   async function enviarLote(def, lote, individual) {

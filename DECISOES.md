@@ -28,3 +28,24 @@ Registro das decisões de implementação. Cada etapa acrescenta as suas.
 22. **SheetJS 0.18.5** (versão disponível no registro npm) em `vendor/`. Recomenda-se trocar pela 0.20.3 do site oficial (cdn.sheetjs.com) quando possível; a 0.18.5 tem alerta de segurança para arquivos maliciosos, risco baixo aqui porque só lê planilhas da própria equipe.
 23. **Ícone de instalação** gerado a partir do símbolo da EDP sobre o verde-petróleo do cabeçalho; o logotipo completo fica no menu lateral (versão branca) e, para os PDFs, há a versão escura `icons/logo-edp.png`.
 24. **Sem e-mails da equipe nos scripts.** O primeiro admin é definido por um comando avulso descrito no ATIVAR-BASE-CENTRAL.md.
+
+## Etapas 2 e 3 – Cadastros e Portal de Entrada (v1.1.0)
+
+25. **Etapas 2 e 3 entregues juntas**, a pedido do usuário, porque o Portal de Entrada depende dos cadastros de materiais, preços e fornecedores.
+26. **Catálogo de materiais comum a todos os projetos** (sem `projeto_id`); os **preços de referência** são por projeto, família e vigência. A chave do material é família + descrição normalizada (maiúsculas, sem acentos, espaços/hífens unificados), que é o que vem na NF.
+27. **Quem grava**: materiais, fornecedores e frentes – admin e almoxarife; preços de referência – só admin; consulta só lê. Para cadastrar um fornecedor novo, o almoxarife pode criar empresas do tipo **fornecedor** (as demais empresas continuam só com o admin).
+28. **Preços iniciais** do projeto C3 com vigência 01/01/2024: cabos 20,98640209; fixadores 9,35; ferragem 9,352 (R$/kg). Isoladores não têm preço de família: usam o preço unitário de cada material.
+29. **Pendente**: fixador/ferragem sem peso unitário, isolador sem preço unitário ou família sem preço vigente. O item entra com valor 0, em rosa, e o recebimento pode ser confirmado (o aviso aparece na confirmação).
+30. **Cálculo no servidor** pelo gatilho `tg_entrada_item_calcula`: o valor enviado pelo app é sempre recalculado. Preço usado = vigente na **data de recebimento**.
+31. **Material novo no lançamento**: se a descrição não está no catálogo, o sistema oferece cadastrar na hora (sem peso/preço = Pendente). Na importação de itens por planilha, materiais novos são criados automaticamente (com o peso unitário da planilha, se houver).
+32. **Carretel único no projeto** (índice no banco + checagem na tela), preparando a saída por carretel inteiro da etapa 4.
+33. **NF duplicada** = mesma NF + série + fornecedor, inclusive rascunhos. O sistema avisa e oferece abrir o lançamento existente.
+34. **Confirmação no servidor exige NF e relatório fotográfico anexados**; por isso os anexos sobem antes da entrada na sincronização. A exigência de itens com quantidade é feita no app.
+35. **Recebimento confirmado** só é alterado ou excluído pelo admin. Edições feitas antes da confirmação (offline) ainda são aceitas quando chegam depois.
+36. **Rascunho**: "Salvar rascunho" grava e sincroniza o lançamento (aparece em "Rascunhos" para todos do lote). Enquanto não salva, o que foi digitado fica guardado no aparelho e volta se o app for recarregado.
+37. **Status "Aguardando"** do item fica reservado (o banco aceita); nesta etapa os itens entram como Conferido ou Pendente.
+38. **Cartões de família no Portal de Entrada** mostram o valor recebido confirmado no contexto; até a etapa 4 (saídas) ele é igual ao valor em estoque.
+39. **Transportadora** é texto livre com sugestões das empresas do tipo Transportadora.
+40. **Placa** é gravada sem hífen e em maiúsculas (AAA0000 ou AAA0A00).
+41. **Saldo mínimo (crítico)** já pode ser informado no material; o uso fica para a tela de Saldo (etapa 4).
+42. **Menu**: o rótulo "etapa N" passou para baixo do nome, em letra menor, para não quebrar o texto.

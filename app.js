@@ -65,8 +65,8 @@ const APP = (function () {
 
   function renderMenu() {
     const html = MENU.map(g => '<div class="menu-grupo"><div class="titulo">' + g.grupo + '</div>' +
-      g.itens.map(i => '<button type="button" class="menu-item" data-tela="' + i.id + '">' + svg(i.ico) + '<span>' + esc(i.t) + '</span>' +
-        (i.etapa > CONFIG.etapa ? '<span class="etapa">etapa ' + i.etapa + '</span>' : '') + '</button>').join('') + '</div>').join('');
+      g.itens.map(i => '<button type="button" class="menu-item" data-tela="' + i.id + '">' + svg(i.ico) + '<span class="rot">' + esc(i.t) +
+        (i.etapa > CONFIG.etapa ? '<small class="etapa">etapa ' + i.etapa + '</small>' : '') + '</span></button>').join('') + '</div>').join('');
     document.getElementById('menu-lateral').innerHTML = html;
     document.getElementById('mais-conteudo').innerHTML = html;
     const nav = NAV_INFERIOR.map(id => { const i = itemMenu(id); return '<button type="button" data-tela="' + id + '">' + svg(i.ico, 22) + '<span>' + esc(i.curto) + '</span></button>'; }).join('') +
@@ -105,6 +105,10 @@ const APP = (function () {
     }
     if (id === 'tela-inicio') montarInicio();
     if (id === 'tela-contexto' && window.CAD) CAD.montar();
+    if (id === 'tela-materiais' && window.CADM) CADM.montar('materiais');
+    if (id === 'tela-fornecedores' && window.CADM) CADM.montar('fornecedores');
+    if (id === 'tela-frentes' && window.CADM) CADM.montar('frentes');
+    if (id === 'tela-entrada' && window.ENTRADA) ENTRADA.montar();
     const h1 = document.querySelector('#' + alvo + ' h1, #' + alvo + ' h2');
     if (h1 && !acesso) { h1.setAttribute('tabindex', '-1'); h1.focus({ preventScroll: true }); }
   }
@@ -228,6 +232,15 @@ const APP = (function () {
     const txt = '﻿' + [cabecalho].concat(linhas).map(l => l.map(cel).join(';')).join('\r\n');
     baixarArquivo(new Blob([txt], { type: 'text/csv;charset=utf-8' }), nome);
   }
+  /** Lê CSV (;) ou XLSX com SheetJS e devolve linhas com chaves normalizadas (ex.: PESO_UNIT). */
+  async function lerPlanilha(file) {
+    if (!window.XLSX) throw new Error('Leitor de planilhas indisponível. Recarregue o aplicativo.');
+    let wb;
+    try { wb = XLSX.read(await file.arrayBuffer(), { type: 'array', codepage: 65001, raw: false }); }
+    catch (e) { throw new Error('Não foi possível ler o arquivo. Use o modelo (CSV com ";" ou XLSX).'); }
+    const linhas = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });
+    return linhas.map(l => { const o = {}; Object.keys(l).forEach(k => { o[normalizar(k).replace(/[^A-Z0-9]+/g, '_').replace(/^_|_$/g, '')] = String(l[k]).trim(); }); return o; });
+  }
   function baixarArquivo(blob, nome) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob); a.download = nome;
@@ -235,6 +248,7 @@ const APP = (function () {
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
   }
   function rotuloTipoEmpresa(v) { const x = CONFIG.tiposEmpresa.find(t => t.v === v); return x ? x.t : (v || '-'); }
+  function rotuloFamilia(v) { const x = CONFIG.familias.find(t => t.v === v); return x ? x.t : (v || '-'); }
   function rotuloPerfil(v) { const x = CONFIG.perfis.find(t => t.v === v); return x ? x.t : (v || '-'); }
   function marcaSync(r) {
     if (!r || r._sync === 'sincronizado' || !r._sync) return '';
@@ -466,6 +480,9 @@ const APP = (function () {
       await CTX.montar();
       const tela = telaAtual && document.getElementById(telaAtual);
       if (tela && tela.querySelector('form[data-sujo]')) return;
+      const ae = document.activeElement;
+      if (tela && ae && tela.contains(ae) && /^(INPUT|SELECT|TEXTAREA)$/.test(ae.tagName)) return;
+      if (telaAtual === 'tela-entrada' && window.ENTRADA && ENTRADA.estado() && ENTRADA.estado().sujo) return;
       remontar();
     });
     document.addEventListener('auth:escopo', async ev => {
@@ -494,7 +511,7 @@ const APP = (function () {
     mostrarTela, remontar, aviso, confirmar, svg, CTX,
     esc, fmtNum, fmtMoeda, parseNum, arred, dataISO, dataBR, dataHoraBR, mascaraData,
     soDigitos, validarCNPJ, formatarCNPJ, mascaraCNPJ, validarPlaca, validarChaveNFe, normalizar,
-    iniciais, baixarCSV, baixarArquivo, rotuloTipoEmpresa, rotuloPerfil, marcaSync,
+    iniciais, baixarCSV, lerPlanilha, baixarArquivo, rotuloTipoEmpresa, rotuloPerfil, rotuloFamilia, marcaSync,
     telaAtual: () => telaAtual
   };
 })();

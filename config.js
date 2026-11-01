@@ -5,8 +5,8 @@
    ===================================================================== */
 const CONFIG = (function () {
   return {
-    versao: '1.0.1',
-    etapa: 1,
+    versao: '1.1.0',
+    etapa: 3,
     nomeApp: 'Estoque de Materiais – HUB RBG',
     empresaApp: 'EDP Transmissão Norte Nordeste 2 S.A.',
 
@@ -20,7 +20,7 @@ const CONFIG = (function () {
     heartbeatMs: 25000,
     paginaRecebimento: 500,
     loteEnvio: 200,
-    realtime: ['empresas', 'projetos', 'locais', 'lotes', 'usuarios'],
+    realtime: ['empresas', 'projetos', 'locais', 'lotes', 'usuarios', 'entradas'],
 
     // Anexos
     limitePdfMB: 20,
@@ -32,6 +32,18 @@ const CONFIG = (function () {
       { v: 'executora', t: 'Executora' },
       { v: 'transportadora', t: 'Transportadora' },
       { v: 'fornecedor', t: 'Fornecedor' }
+    ],
+    familias: [
+      { v: 'cabos', t: 'Cabos', unidade: 'm', base: 'kg' },
+      { v: 'isoladores', t: 'Isoladores', unidade: 'un', base: 'un' },
+      { v: 'fixadores', t: 'Fixadores', unidade: 'un', base: 'kg' },
+      { v: 'ferragem', t: 'Ferragem', unidade: 'pç', base: 'kg' }
+    ],
+    categoriasFixadores: ['Parafusos', 'Porca', 'Arruela', 'Calço'],
+    statusFrente: [
+      { v: 'ativa', t: 'Ativa' },
+      { v: 'planejada', t: 'Planejada' },
+      { v: 'encerrada', t: 'Encerrada' }
     ],
     perfis: [
       { v: 'admin', t: 'Administrador' },
